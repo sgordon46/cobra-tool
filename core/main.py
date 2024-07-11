@@ -26,34 +26,6 @@ def print_ascii_art(text):
     ascii_art = pyfiglet.figlet_format(text)
     print(colored(ascii_art, color="cyan"))
 
-def select_cloud_provider():
-    print(colored("Select Cloud Provider:", color="yellow"))
-    print(colored("1. AWS", color="green")) 
-    print(colored("2. Azure", color="green"))
-    print(colored("3. GCP", color="green"))
-    while True:
-        try:
-            choice = int(input(colored("Enter your choice (1/2/3/4): ", color="yellow")))
-            if choice not in [1, 2, 3, 4]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, or 4.", color="red"))
-            return choice
-        except ValueError as e:
-            print(e)
-
-def select_attack_scenario(cloud_provider):
-    print(colored("Select Attack Scenario of %s:", color="yellow") % cloud_provider)
-    print(colored("1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning", color="green"))
-    print(colored("2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence", color="green"))
-    print(colored("3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="green"))
-    print(colored("4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access", color="green"))
-    while True:
-        try:
-            choice = int(input(colored("Enter your choice: ", color="yellow")))
-            if choice not in [1, 2, 3, 4]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3 or 4.", color="red"))
-            return choice
-        except ValueError as e:
-            print(e)
 
 def get_credentials():
     while True:
@@ -85,39 +57,28 @@ def execute_scenario(x):
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
 
-def main(cloud_provider, action, simulation, scenario):
-    tool_name = "C O B R A"
-    print(scenario)
-    print_ascii_art(tool_name)
-    if cloud_provider == 'aws':
-        if action == 'launch':
-            if simulation is True:
-                scenario_choice = select_attack_scenario(cloud_provider)
-                if scenario_choice == 1:
-                    # Pass the selected scenario module to execute
-                    execute_scenario(1)
-                elif scenario_choice == 2:
-                    execute_scenario(2)
-                elif scenario_choice == 3:
-                    execute_scenario(3)
-                elif scenario_choice == 4:
-                    execute_scenario(4)
-                    #print(colored("Scenario coming soon!", color="yellow"))
-        elif action == 'status' and scenario == "scenario-1":
-            subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)
-        elif action == 'status' and scenario == "scenario-2":
-            subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi stack ls", shell=True)
-        elif action == 'destroy' and scenario == "scenario-1":
-            subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy", shell=True)
-        elif action == 'destroy' and scenario == "scenario-2":
-            scenario_2_destroy()    
-        elif action == 'destroy' and scenario == "scenario-3":
-            subprocess.call("cd ./scenarios/scenario_3/infra && pulumi destroy -s ", shell=True)
-        elif action == 'destroy' and scenario == "scenario-4":
-            subprocess.call("cd ./scenarios/scenario_4/infra && pulumi destroy -s aws-scenario-3", shell=True)
+def main(args):
 
-        else:
-            print('No options provided. --help to know more')
+    if(args.verbose is True):print(args)
+
+    tool_name = "C O B R A"
+    print("Cloud Provider: "+str(args.cloud_provider))
+    print("Scenerio #"+str(args.scenario))
+    print("Action: "+str(args.action))
+    print_ascii_art(tool_name)
+
+    stack=str(args.cloud_provider)+"-scenario-"+str(args.scenario)
+    if(args.verbose is True):print("Pulumi Stack Name: "+str(stack))
+
+    if args.action == "launch":
+        subprocess.call("pulumi -C scenarios/scenario_"+str(args.scenario)+"/infra/ stack init "+stack, shell=True)
+        execute_scenario(int(args.scenario))
+    elif args.action == "status": 
+        subprocess.call("pulumi -C scenarios/scenario_"+str(args.scenario)+"/infra/ stack ls -s "+stack, shell=True)
+    elif args.action == "destroy": 
+        subprocess.call("pulumi -C scenarios/scenario_"+str(args.scenario)+"/infra/ destroy --remove --yes -s "+stack, shell=True)
+
+
 
 if __name__ == "__main__":
     main()
