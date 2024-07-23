@@ -13,7 +13,7 @@ def parse_arguments():
     parser.add_argument("-s","--scenario", choices=range(1, 5), default="1", type=int,help=dedent('''\
     
     1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning.
-    2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
+    2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence
     3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
     4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access\n
     '''))

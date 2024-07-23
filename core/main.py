@@ -10,7 +10,7 @@ from .report import gen_report
 from .report import gen_report_2
 from scenarios.scenario_1.scenario_1 import scenario_1_execute
 from scenarios.scenario_2.scenario_2 import scenario_2_execute
-from scenarios.scenario_2.scenario_2 import scenario_2_destroy
+#from scenarios.scenario_2.scenario_2 import scenario_2_destroy
 from scenarios.scenario_3.scenario_3 import scenario_3_execute
 from scenarios.scenario_4.scenario_4 import scenario_4_execute
 
